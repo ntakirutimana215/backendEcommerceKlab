@@ -14,19 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRevenueAnalytics = exports.getDashboardStats = void 0;
 const orderModel_1 = __importDefault(require("../models/orderModel"));
-const userModel_1 = __importDefault(require("../models/userModel"));
+const userModel_1 = require("../models/userModel"); // ✅ fixed import
 const productmodels_1 = __importDefault(require("../models/productmodels"));
 // GET DASHBOARD STATISTICS
 const getDashboardStats = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Get total counts
         const totalOrders = yield orderModel_1.default.countDocuments();
-        const totalUsers = yield userModel_1.default.countDocuments();
+        const totalUsers = yield userModel_1.User.countDocuments();
         const totalProducts = yield productmodels_1.default.countDocuments();
-        // Calculate total sales
         const orders = yield orderModel_1.default.find();
         const totalSales = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-        // Get recent orders count (last 30 days)
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         const recentOrders = yield orderModel_1.default.countDocuments({
@@ -50,13 +47,12 @@ exports.getDashboardStats = getDashboardStats;
 // GET REVENUE ANALYTICS
 const getRevenueAnalytics = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Get orders from last 8 days
         const eightDaysAgo = new Date();
         eightDaysAgo.setDate(eightDaysAgo.getDate() - 8);
         const orders = yield orderModel_1.default.find({
             createdAt: { $gte: eightDaysAgo }
         }).sort({ createdAt: 1 });
-        // Group by date
+        // ✅ Explicitly type the revenueData array
         const revenueData = [];
         const dateMap = new Map();
         // Initialize all 8 days
@@ -69,13 +65,13 @@ const getRevenueAnalytics = (req, res) => __awaiter(void 0, void 0, void 0, func
         // Aggregate data
         orders.forEach(order => {
             const dateStr = order.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            if (dateMap.has(dateStr)) {
-                const data = dateMap.get(dateStr);
+            const data = dateMap.get(dateStr);
+            if (data) {
                 data.revenue += order.totalAmount;
                 data.orders += 1;
             }
         });
-        // Convert to array
+        // Convert map to array
         dateMap.forEach(value => revenueData.push(value));
         res.status(200).json(revenueData);
     }

@@ -21,7 +21,7 @@ const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000; // default 5000
 // ✅ Enable CORS
 app.use((0, cors_1.default)({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5174",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
