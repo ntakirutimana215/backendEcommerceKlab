@@ -5,9 +5,8 @@
   "main": "server.ts",
   "scripts": {
     "dev": "nodemon --watch src --watch src/routes --watch src/controllers --ext ts --exec ts-node --transpile-only src/server.ts",
-    "start": "ts-node src/server.ts",
-    "build": "tsc",
     "start": "node dist/server.js",
+    "build": "tsc",
     "serve": "node dist/server.js"
   },
   "author": "Angel Developer",
@@ -21,6 +20,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.6.0",
     "@types/nodemailer": "^7.0.1",
+    "@types/swagger-ui-express": "^4.1.8",
     "express": "^5.1.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
@@ -39,6 +39,8 @@
     "multer": "^2.0.2",
     "nodemailer": "^7.0.6",
     "recharts": "^3.2.0",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
