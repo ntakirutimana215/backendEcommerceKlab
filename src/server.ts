@@ -18,22 +18,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Define allowed origins (no trailing slashes!)
+// ✅ Allowed origins (no trailing slashes!)
 const allowedOrigins = [
   process.env.CLIENT_URL || "https://ecommerce-frontend-project-cptz.vercel.app",
   "https://ecommerce-frontend-project-cptz.vercel.app",
-  "http://localhost:5173", // for local dev
+  "http://localhost:5173", // for local development
 ];
 
 // ✅ CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow non-browser tools like Postman
+      if (!origin) return callback(null, true); // allow Postman/cURL
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("CORS not allowed for this origin: " + origin));
+        callback(new Error("CORS not allowed for origin: " + origin));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -41,9 +41,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-// ✅ Handle preflight requests
-app.options("*", cors());
 
 // ✅ Middleware
 app.use(express.json());
