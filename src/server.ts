@@ -14,31 +14,27 @@ import resetRoutes from "./routes/resetRoutes";
 import { setupSwagger } from "./swagger";
 
 dotenv.config();
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Allowed origins (no trailing slashes!)
+// ✅ Allow multiple origins
 const allowedOrigins = [
-  process.env.CLIENT_URL || "https://ecommerce-frontend-project-cptz.vercel.app",
-  "https://ecommerce-frontend-project-cptz.vercel.app",
-  "http://localhost:5173", // for local development
-];
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.CLIENT_URL as string,
+].filter(Boolean); // remove undefined values
 
-// ✅ CORS configuration
+// ✅ Enable CORS
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow Postman/cURL
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed for origin: " + origin));
-      }
-    },
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
 
@@ -47,7 +43,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// ✅ Connect to Database
+// ✅ Connect to DB
 connectDB();
 
 // ✅ API Routes
@@ -55,26 +51,26 @@ app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/products", productRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api", contactEmailRoute);
 app.use("/api/reset", resetRoutes);
 
-// ✅ Swagger docs
-setupSwagger(app);
-
-// ✅ Root route
 app.get("/", (_req: Request, res: Response) => {
+  res.send("API is running...");
   res.send("API is running...");
 });
 
-// ✅ Global error handler
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("Unhandled error:", err);
-  res.status(err.status || 500).json({
-    message: err.message || "Internal Server Error",
-  });
-});
+// ✅ Global Error Handler
+app.use(
+  (err: any, _req: Request, res: Response, _next: NextFunction) => {
+    console.error("Unhandled error:", err);
+    res.status(err.status || 500).json({
+      message: err.message || "Internal Server Error",
+    });
+  }
+);
 
 // ✅ Start server
 app.listen(PORT, () => {
